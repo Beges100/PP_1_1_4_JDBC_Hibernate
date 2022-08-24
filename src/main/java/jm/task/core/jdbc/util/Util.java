@@ -11,17 +11,19 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class Util {
-    private static final SessionFactory concreteSessionFactory ;
+    private static final SessionFactory concreteSessionFactory;
 
     static {
         try {
             Properties prop = new Properties();
+            prop.put("connection.driver_class", "com.mysql.jdbc.Driver");
             prop.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/mydbtest");
             prop.setProperty("hibernate.connection.username", "root");
             prop.setProperty("hibernate.connection.password", "Kostya102938");
             prop.setProperty("dialect", "org.hibernate.dialect.MySQLDialect");
+            prop.setProperty("hibernate.current_session_context_class", "thread");
 
-            prop.setProperty("hibernate.hbm2ddl.auto", "create");
+           // prop.setProperty("hibernate.hbm2ddl.auto", "create");
 
             concreteSessionFactory = new org.hibernate.cfg.Configuration()
                     .addProperties(prop)
