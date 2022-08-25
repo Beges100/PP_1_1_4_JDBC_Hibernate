@@ -3,15 +3,14 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
-import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
     public UserDaoHibernateImpl() {
 
     }
-
 
     @Override
     public void createUsersTable() {
@@ -25,26 +24,51 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-
+        String drop = "DROP TABLE IF EXISTS User ";
+        Session session = Util.getSession();
+        session.beginTransaction();
+        session.createSQLQuery(drop).executeUpdate();
+        session.getTransaction().commit();
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-
+        Session session = Util.getSession();
+        session.beginTransaction();
+        User user = new User(name,lastName,age);
+        session.save(user);
+        session.evict(user);
+        session.getTransaction().commit();
     }
 
     @Override
     public void removeUserById(long id) {
-
+        String sqlDeleteString = "delete User where id = :param";
+        Session session = Util.getSession();
+        session.beginTransaction();
+        session.createQuery(sqlDeleteString)
+                .setParameter("param", id)
+                .executeUpdate();
+        session.getTransaction().commit();
     }
 
     @Override
     public List<User> getAllUsers() {
-        return null;
+        String sql = "from User";
+        Session session = Util.getSession();
+        session.beginTransaction();
+        List<User> list = session.createQuery(sql).list();
+        session.getTransaction().commit();
+
+        return list;
     }
 
     @Override
     public void cleanUsersTable() {
-
+        Session session = Util.getSession();
+        session.beginTransaction();
+        String hql = String.format("delete from User");
+        session.createQuery(hql).executeUpdate();
+        session.getTransaction().commit();
     }
 }
