@@ -44,7 +44,6 @@ public class UserDaoHibernateImpl implements UserDao {
         session.beginTransaction();
         User user = new User(name,lastName,age);
         session.save(user);
-        session.evict(user);
         session.getTransaction().commit();
         } catch (HibernateException e) {
             e.printStackTrace();
@@ -56,9 +55,8 @@ public class UserDaoHibernateImpl implements UserDao {
         String sqlDeleteString = "delete User where id = :param";
         try(Session session = Util.getSession()) {
             session.beginTransaction();
-            session.createQuery(sqlDeleteString)
-                    .setParameter("param", id)
-                    .executeUpdate();
+            User user = session.get(User.class, id);
+            session.delete(user);
             session.getTransaction().commit();
         } catch (HibernateException e) {
             e.printStackTrace();
@@ -71,11 +69,11 @@ public class UserDaoHibernateImpl implements UserDao {
         String sql = "from User";
 
         try(Session session = Util.getSession()) {
-        session.beginTransaction();
-        List<User> list = session.createQuery(sql).list();
-        session.getTransaction().commit();
+            session.beginTransaction();
+            List<User> list = session.createQuery(sql).list();
+            session.getTransaction().commit();
 
-        return list;
+            return list;
         } catch (HibernateException e) {
             e.printStackTrace();
         }
